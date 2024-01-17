@@ -143,8 +143,23 @@ static ImVec2           InputTextCalcTextSizeW(ImGuiContext* ctx, const ImWchar*
 // - BulletTextV()
 //-------------------------------------------------------------------------
 
+const char* (*ImGui::imgui_localized_func_ptr)(const char*);
+
+const char* ImGui::GetLocalizedText(const char* text) {
+    if (ImGui::imgui_localized_func_ptr != nullptr) {
+        return ImGui::imgui_localized_func_ptr(text);
+    }
+    return text;
+}
+
 void ImGui::TextEx(const char* text, const char* text_end, ImGuiTextFlags flags)
 {
+    const char* tmp = ImGui::GetLocalizedText(text);
+    if (tmp != text)
+    {
+        text = tmp;
+        text_end = tmp + strlen(tmp);
+    }
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return;
@@ -266,6 +281,7 @@ void ImGui::Text(const char* fmt, ...)
 
 void ImGui::TextV(const char* fmt, va_list args)
 {
+    fmt = ImGui::GetLocalizedText(fmt);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return;
@@ -679,6 +695,7 @@ bool ImGui::ButtonBehavior(const ImRect& bb, ImGuiID id, bool* out_hovered, bool
 
 bool ImGui::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -1096,6 +1113,7 @@ bool ImGui::ImageButton(ImTextureID user_texture_id, const ImVec2& size, const I
 
 bool ImGui::Checkbox(const char* label, bool* v)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -1672,6 +1690,7 @@ static float CalcMaxPopupHeightFromItemCount(int items_count)
 
 bool ImGui::BeginCombo(const char* label, const char* preview_value, ImGuiComboFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = GetCurrentWindow();
 
@@ -1953,7 +1972,7 @@ bool ImGui::Combo(const char* label, int* current_item, const char* const items[
 bool ImGui::Combo(const char* label, int* current_item, const char* items_separated_by_zeros, int height_in_items)
 {
     int items_count = 0;
-    const char* p = items_separated_by_zeros;       // FIXME-OPT: Avoid computing this, or at least only when combo is open
+    const char* p = ImGui::GetLocalizedText(items_separated_by_zeros);       // FIXME-OPT: Avoid computing this, or at least only when combo is open
     while (*p)
     {
         p += strlen(p) + 1;
@@ -2389,6 +2408,7 @@ bool ImGui::DragBehavior(ImGuiID id, ImGuiDataType data_type, void* p_v, float v
 // Read code of e.g. DragFloat(), DragInt() etc. or examples in 'Demo->Widgets->Data Types' to understand how to use this function directly.
 bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data, float v_speed, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -2477,6 +2497,7 @@ bool ImGui::DragScalar(const char* label, ImGuiDataType data_type, void* p_data,
 
 bool ImGui::DragScalarN(const char* label, ImGuiDataType data_type, void* p_data, int components, float v_speed, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -2981,6 +3002,7 @@ bool ImGui::SliderBehavior(const ImRect& bb, ImGuiID id, ImGuiDataType data_type
 // Read code of e.g. SliderFloat(), SliderInt() etc. or examples in 'Demo->Widgets->Data Types' to understand how to use this function directly.
 bool ImGui::SliderScalar(const char* label, ImGuiDataType data_type, void* p_data, const void* p_min, const void* p_max, const char* format, ImGuiSliderFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -3065,6 +3087,7 @@ bool ImGui::SliderScalar(const char* label, ImGuiDataType data_type, void* p_dat
 // Add multiple sliders on 1 line for compact edition of multiple components
 bool ImGui::SliderScalarN(const char* label, ImGuiDataType data_type, void* v, int components, const void* v_min, const void* v_max, const char* format, ImGuiSliderFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -3442,6 +3465,7 @@ bool ImGui::TempInputScalar(const ImRect& bb, ImGuiID id, const char* label, ImG
 // Read code of e.g. InputFloat(), InputInt() etc. or examples in 'Demo->Widgets->Data Types' to understand how to use this function directly.
 bool ImGui::InputScalar(const char* label, ImGuiDataType data_type, void* p_data, const void* p_step, const void* p_step_fast, const char* format, ImGuiInputTextFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -3517,6 +3541,7 @@ bool ImGui::InputScalar(const char* label, ImGuiDataType data_type, void* p_data
 
 bool ImGui::InputScalarN(const char* label, ImGuiDataType data_type, void* p_data, int components, const void* p_step, const void* p_step_fast, const char* format, ImGuiInputTextFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -6004,6 +6029,7 @@ bool ImGui::TreeNode(const void* ptr_id, const char* fmt, ...)
 
 bool ImGui::TreeNode(const char* label)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -6049,23 +6075,36 @@ bool ImGui::TreeNodeEx(const void* ptr_id, ImGuiTreeNodeFlags flags, const char*
 
 bool ImGui::TreeNodeExV(const char* str_id, ImGuiTreeNodeFlags flags, const char* fmt, va_list args)
 {
+    str_id = ImGui::GetLocalizedText(str_id);
+    fmt = ImGui::GetLocalizedText(fmt);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
 
     const char* label, *label_end;
     ImFormatStringToTempBufferV(&label, &label_end, fmt, args);
+    const char* tmp = ImGui::GetLocalizedText(label);
+    if (tmp != label) {
+        label = tmp;
+        label_end = tmp + strlen(tmp);
+    }
     return TreeNodeBehavior(window->GetID(str_id), flags, label, label_end);
 }
 
 bool ImGui::TreeNodeExV(const void* ptr_id, ImGuiTreeNodeFlags flags, const char* fmt, va_list args)
 {
+    fmt = ImGui::GetLocalizedText(fmt);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
 
     const char* label, *label_end;
     ImFormatStringToTempBufferV(&label, &label_end, fmt, args);
+    const char* tmp = ImGui::GetLocalizedText(label);
+    if (tmp != label) {
+        label = tmp;
+        label_end = tmp + strlen(tmp);
+    }
     return TreeNodeBehavior(window->GetID(ptr_id), flags, label, label_end);
 }
 
@@ -6391,6 +6430,7 @@ void ImGui::SetNextItemOpen(bool is_open, ImGuiCond cond)
 // This is basically the same as calling TreeNodeEx(label, ImGuiTreeNodeFlags_CollapsingHeader). You can remove the _NoTreePushOnOpen flag if you want behavior closer to normal TreeNode().
 bool ImGui::CollapsingHeader(const char* label, ImGuiTreeNodeFlags flags)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
@@ -6447,6 +6487,7 @@ bool ImGui::CollapsingHeader(const char* label, bool* p_visible, ImGuiTreeNodeFl
 // FIXME: Selectable() with (size.x == 0.0f) and (SelectableTextAlign.x > 0.0f) followed by SameLine() is currently not supported.
 bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags flags, const ImVec2& size_arg)
 {
+    label = ImGui::GetLocalizedText(label);
     ImGuiWindow* window = GetCurrentWindow();
     if (window->SkipItems)
         return false;
